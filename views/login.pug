@@ -1,0 +1,12 @@
+extends layout
+
+block content 
+    h1.mb-5 #{title}
+    form(method="POST", action="/registr")
+        .form-group
+            label(for='name') Ismi
+            input#name.form-control(type='text', name="name", aria-describedby='emailHelp')
+        .form-group
+            label(for='singer') Parol
+            input#singer.form-control(type='text', name="email")
+        button.btn.btn-success(type='submit') Tizimga kir
