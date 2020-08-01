@@ -16,13 +16,22 @@ html(lang="en")
           ul.navbar-nav.mr-auto
             li.nav-item
               a.nav-link(href='/') Bosh sahifa
-            li.nav-item
-              a.nav-link(href='/music/add') Musiqa qo'shish
-            li.nav-item
-              a.nav-link(href='/registr') Ro'hatan o'tish
+            if user  
+              li.nav-item
+                a.nav-link(href='/music/add') Musiqa qo'shish
+            
       form.form-inline.my-2.my-lg-0
             input.form-control.mr-sm-2(type='search', placeholder='Qidirish', aria-label='Search')
             button.btn.btn-warning.my-2.my-sm-0(type='submit') Search
+      ul.navbar-nav.nav.nav-right
+        if user
+          li.nav-item
+            a.nav-link(href='/logout') Tizimdan chiqish  
+        else      
+          li.nav-item
+            a.nav-link(href='/registr') Ro'hatan o'tish    
+          li.nav-item
+            a.nav-link(href='/login') Tizimga kirish   
     .container
         != messages('message', locals)
         if errors 

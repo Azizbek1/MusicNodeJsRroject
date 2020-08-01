@@ -2,11 +2,11 @@ extends layout
 
 block content 
     h1.mb-5 #{title}
-    form(method="POST", action="/registr")
+    form(method="POST", action="/login")
         .form-group
-            label(for='name') Ismi
-            input#name.form-control(type='text', name="name", aria-describedby='emailHelp')
+            label(for='name') Foydalanuvchini laqabi 
+            input#name.form-control(type='text', name="username", aria-describedby='emailHelp')
         .form-group
             label(for='singer') Parol
-            input#singer.form-control(type='text', name="email")
+            input#singer.form-control(type='password', name="password")
         button.btn.btn-success(type='submit') Tizimga kir

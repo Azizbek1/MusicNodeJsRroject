@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
 const bodyParse = require("body-parser");
+const passport = require('passport')
 
 // Validatorlar 
 const flash = require('connect-flash');
@@ -65,20 +66,39 @@ app.set("view engine", "pug");
 app.use(express.static(path.join(__dirname, 'public' )))
 
 
-mongoose.connect("mongodb://localhost:27017/NewDb", {
+// Mongo DB ULanish jarayoni
+const db2 = require('./cf/db')
+mongoose.connect(db2.db, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useCreateIndex: true
 });
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
-  console.log(`Mongo DB Local Ulandik`);
+  console.log(`Mongo DB Onlayn Ulandik`);
 });
+
+
+
+//Passport ulash jarayoni 
+require('./cf/passport')(passport)
+app.use(passport.initialize())
+app.use(passport.session())
+
+//User  INIT 
+app.get('*', (req, res, next) => {
+  res.locals.user = req.user || null;
+  next()
+})
+
+
 
 
 const musics = require('./routes/music');
 const users = require('./routes/users');
+
 
 app.use('/', musics)
 app.use('/', users)

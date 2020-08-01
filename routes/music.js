@@ -5,10 +5,26 @@ const router = express.Router();
 
 // Model Ulimiz:
 const Music = require('../model/Musec');
+const User = require('../model/User')
+
+
+// eA = Middlewere
+
+const eA = (req, res, next) => {
+  if(req.isAuthenticated()){
+    next()
+  }
+  else{
+    req.flash('danger', 'Iltimos tizimga kiring !!!!!!!!');
+    res.redirect('/login')
+  }
+}
+
+
 
 
 // Musiqa qo'shish sahifasi
-router.get("/music/add", (req, res) => {
+router.get("/music/add", eA, (req, res) => {
   res.render("music_add", { title: `Musiqa qo'shish sahifasi` });
 });
 
@@ -21,11 +37,12 @@ router.get("/", (req, res) => {
     }
   });
 });
+
 // Musiqa qo'shish sahifasi POST METHOD orqali bazaga jo'natish
-router.post("/music/add", (req, res) => {
+router.post("/music/add", eA, (req, res) => {
 
   req.checkBody('name', `Isim bo'sh bo'lmasligi kerak`).notEmpty()
-  req.checkBody('singer', `Ijrochi bo'sh bo'lmasligi kereak`).notEmpty()
+  // req.checkBody('singer', `Ijrochi bo'sh bo'lmasligi kereak`).notEmpty()
   req.checkBody('comment', `izoh bo'sh bo'lmasligi kereak`).notEmpty()
 
   const errors = req.validationErrors();
@@ -38,13 +55,13 @@ router.post("/music/add", (req, res) => {
   else{
     const music = new Music();
     music.name = req.body.name;
-    music.singer = req.body.singer;
+    music.singer = req.user._id
     music.comment = req.body.comment;
   
     music.save((err) => {
       if (err) console.log(err);
       else {
-        req.flash('warning', `Musiqamiz muofiyaqali qo'shildi`)
+        req.flash('success', `Musiqamiz muofiyaqali qo'shildi`)
         res.redirect("/");
       }
     });
@@ -56,26 +73,42 @@ router.post("/music/add", (req, res) => {
 });
 
 // music id oraqali kirvomiz
-router.get("/musics/:id", (req, res) => {
+router.get("/musics/:id", eA, (req, res) => {
   Music.findById(req.params.id, (err, music) => {
-    res.render("musics", {
-      music: music,
-    });
+
+    // User 
+    User.findById(music.singer, (err, user)=> {
+        res.render("musics", {
+        music: music,
+        singer: user.name
+      });
+    })
+
+    
   });
 });
 
 // musiqa o'zartirish sahifasi id orqali oldik // sardor raximhon
-router.get("/music/edit/:id", (req, res) => {
+router.get("/music/edit/:id",eA, (req, res) => {
   Music.findById(req.params.id, (err, music) => {
+
+
+    // Bu yerda Idet Sahifamizda formda
+    if(music.singer != req.user._id){
+      req.flash('danger', 'haqiz yoq');
+      res.redirect('/')
+    }
     res.render("musics_edit", {
       title: `Musiqani o'zgartiramiz`,
       music: music,
     });
+
+
   });
 });
 
 // musiqa o'zartirish sahifasi id orqali oldik // sardor raximhon
-router.post("/music/edit/:id", (req, res) => {
+router.post("/music/edit/:id", eA, (req, res) => {
   const music = {};
   music.name = req.body.name;
   music.singer = req.body.singer;
@@ -93,12 +126,25 @@ router.post("/music/edit/:id", (req, res) => {
 
 
 // musiqa o'chirish qismi
-router.delete("/musics/:id", (req, res) => {
-  let a = {id: req.params.id};
-  Music.findOneAndDelete(a, (err) => {
-    if (err) console.log(err);
-    res.send('Success')
-  });
+router.delete("/musics/:id", eA, (req, res) => {
+  if(!req.user._id){
+    res.status(500).send();
+  }
+  let a = {_id: req.params.id};
+
+  Music.findById(req.params.id, (err, music) => {
+    if(music.singer != req.user._id){
+      res.status(500).send();
+    }
+    else{
+      Music.findOneAndDelete(a, (err) => {
+        if (err) console.log(err);
+        res.send('Success')
+      });
+    }
+  })
+
+
 });
 
 

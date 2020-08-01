@@ -4,6 +4,7 @@ const router = express.Router();
 
 // Model Ulimiz:
 const User = require('../model/User');
+const passport = require("passport");
 
 router.get('/registr', (req, res) => {
     res.render('registr', {
@@ -71,6 +72,21 @@ router.get('/login', (req, res) => {
     res.render('login', {
         title: 'Login Sahifasi'
     })
+})
+
+router.post('/login', (req, res, next) => {
+    passport.authenticate('local', {
+        successRedirect: "/",
+        failureRedirect: "/login",
+        failureFlash: true
+    })(req, res, next)
+})
+
+// logout
+router.get('/logout', (req, res) => {
+    req.logout();
+    req.flash('success', 'Mufiqatli tizimdan chiqb ketingiz')
+    res.redirect('/login')
 })
 
 

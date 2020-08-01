@@ -2,11 +2,12 @@ extends layout
 
 block content
   div
-    h1 Ijochi: #{music.singer}
+ 
     hr
-    h5 Musiqa nomi:  #{music.name}
+    h5 Bastakor:  #{singer}
     hr
     p Izox: #{music.comment}
-
+    //- if user
+    //-   if user.id === music.singer
     a.btn.btn-warning.mr-5(href="/music/edit/" + music._id) o'zgartirsh
     button.btn.btn-danger.music_delete(type="submit" data-id=music._id) o'chirish
