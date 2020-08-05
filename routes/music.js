@@ -80,7 +80,7 @@ router.get("/musics/:id", eA, (req, res) => {
     User.findById(music.singer, (err, user)=> {
         res.render("musics", {
         music: music,
-        singer: user.name
+        singer: user
       });
     })
 
